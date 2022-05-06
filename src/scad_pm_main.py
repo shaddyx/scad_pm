@@ -18,7 +18,8 @@ lib_dir = os.path.join(os.getcwd(), "./lib")
 def parse_repo_dir(repo: str):
     return repo.split("/")[-1].split(".")[0]
 
-def parse_line(path, line) -> Dep:
+def parse_line(path, line: str) -> Dep:
+    line = line.strip()
     logging.info("parsing line: {}".format(line))
     logging.info("path: {}".format(path))
     return Dep(path, line, parse_repo_dir(line))
