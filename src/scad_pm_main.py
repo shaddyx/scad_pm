@@ -6,14 +6,18 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Openscad package manager')
 parser.add_argument('--v', action='store_true', help='verbose output')
+parser.add_argument('--upgrade', action='store_true', help='upgrade packages')
+parser.add_argument('--lib-path', dest='lib_path', default='./lib', help='library path')
+parser.add_argument('--pm-file', dest='pm_file', default='scad.pm', help='pm file name')
+
 args = parser.parse_args()
 logging.basicConfig(level=logging.DEBUG if args.v else logging.INFO)
 
 import proc_util
 from scad_dep import Dep
 
-dep_file_name = "scad.pm"
-lib_dir = os.path.join(os.getcwd(), "./lib")
+dep_file_name = args.pm_file
+lib_dir = os.path.join(os.getcwd(), args.lib_path)
 
 def parse_repo_dir(repo: str):
     return repo.split("/")[-1].split(".")[0]
@@ -32,6 +36,9 @@ def parse_scad_pm(path):
 
 
 def update_dep(dep: Dep):
+    if not args.upgrade:
+        logging.info("skipping upgrade, see --upgrade, for package: {}".format(dep))
+        return
     logging.info("Updating dep: {}".format(dep))
     proc_util.call(dep.full_dir(), ["git", "pull"])
 
