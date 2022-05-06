@@ -26,7 +26,12 @@ def parse_line(path, line: str) -> Dep:
     line = line.strip()
     logging.info("parsing line: {}".format(line))
     logging.info("path: {}".format(path))
-    return Dep(path, line, parse_repo_dir(line))
+    return Dep(
+        path,
+        line,
+        parse_repo_dir(line),
+        line.startswith("#")
+    )
 
 def parse_scad_pm(path):
     if not os.path.exists(path):
@@ -58,6 +63,8 @@ def resolve_dep(dep: Dep):
 def work_on_dep_file(dep_file):
     pm = parse_scad_pm(dep_file)
     for k in pm:
+        if k.skip:
+            continue
         resolve_dep(k)
         nested_dep_file = os.path.join(k.full_dir(), dep_file_name)
         if os.path.exists(nested_dep_file):
