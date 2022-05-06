@@ -1,0 +1,9 @@
+#=========ADDED_AUTOMATICALLY=============
+.idea
+.eclipse
+.config
+.vscode
+.settings
+
+
+dist
