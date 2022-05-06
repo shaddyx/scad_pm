@@ -1,0 +1,8 @@
+setup.py
+src/proc_util.py
+src/scad_dep.py
+src/scad_pm.py
+src/scad_pm.egg-info/PKG-INFO
+src/scad_pm.egg-info/SOURCES.txt
+src/scad_pm.egg-info/dependency_links.txt
+src/scad_pm.egg-info/top_level.txt

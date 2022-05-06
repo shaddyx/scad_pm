@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-
-import argparse
-
-# parser = argparse.ArgumentParser(description='Openscad package manager')
-# args = parser.parse_args()
 import os.path
 import logging
-logging.basicConfig(level=logging.INFO)
+import sys
+import argparse
+
+parser = argparse.ArgumentParser(description='Openscad package manager')
+parser.add_argument('--v', action='store_true', help='verbose output')
+args = parser.parse_args()
+logging.basicConfig(level=logging.DEBUG if args.v else logging.INFO)
 
 import proc_util
 from scad_dep import Dep
@@ -38,6 +39,7 @@ def download_dep(dep: Dep):
     proc_util.call(dep.path, ["git", "clone", dep.git_url])
 
 def resolve_dep(dep: Dep):
+    logging.debug("Resolving dep: {}".format(dep))
     if not os.path.exists(dep.path):
         os.mkdir(dep.path)
     if not os.path.exists(dep.full_dir()):
@@ -47,11 +49,15 @@ def resolve_dep(dep: Dep):
 
 def work_on_dep_file(dep_file):
     pm = parse_scad_pm(dep_file)
-    #logging.info("found lines: {}".format(list(pm)))
     for k in pm:
         resolve_dep(k)
         nested_dep_file = os.path.join(k.full_dir(), dep_file_name)
         if os.path.exists(nested_dep_file):
+            logging.info("processing nested dep file: {}".format(nested_dep_file))
             work_on_dep_file(nested_dep_file)
+
+if not os.path.exists(dep_file_name):
+    logging.error("No dep file found: {}".format(dep_file_name))
+    sys.exit(1)
 
 work_on_dep_file(dep_file_name)
