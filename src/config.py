@@ -1,3 +1,4 @@
+import abc
 import dataclasses
 import logging
 import typing
@@ -20,15 +21,19 @@ class ArgsConfig:
     def __str__(self):
         return "{}:[{}]".format(self.__class__.__name__, self.__dict__)
 
+
 class DEP_TYPES:
     git = "git"
+
 
 @dataclass_json()
 @dataclasses.dataclass
 class Dependency(object):
     url: str
     path: typing.Optional[str] = None
+    revision: typing.Optional[str] = None
     dependency_type: str = DEP_TYPES.git
+
 
 @dataclass_json()
 @dataclasses.dataclass
@@ -36,7 +41,20 @@ class YamlConfig(object):
     dependencies: typing.List[Dependency]
 
 
-class YamlConfigParser:
+class ConfigParser:
+    @abc.abstractmethod
+    def parse(self, file: str):
+        pass
+
+    @abc.abstractmethod
+    def is_type(self, file: str) -> bool:
+        pass
+
+
+class YamlConfigParser(ConfigParser):
+    def is_type(self, file: str) -> bool:
+        return file.split(".")[-1] == 'yaml'
+
     @Inject()
     def __init__(self, args_config: ArgsConfig):
         self.args_config = args_config
@@ -53,3 +71,20 @@ class YamlConfigParser:
             if dep.path is None:
                 dep.path = dep.url.split("/")[-1].split(".")[0]
         return conf
+
+class MainConfigParser:
+    @Inject()
+    def __init__(self, scope: scopeton.scope.Scope):
+        self.scope = scope
+        self.parsers = scope.getInstances(ConfigParser)
+        logging.info("Config parsers: {}".format(self.parsers))
+
+    def _get_parser(self, file: str) -> ConfigParser:
+        for k in self.parsers:
+            if k.is_type(file):
+                return k
+        raise Exception("Parser not found for file: {}".format(file))
+
+    def parse(self, file: str) -> YamlConfig:
+        return self._get_parser(file).parse(file)
+

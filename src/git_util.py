@@ -22,6 +22,7 @@ class GitFetcher:
             self.update_dep(dep_config, dep)
 
     def update_dep(self, dep_config: config.YamlConfig, dep: config.Dependency):
+        self.goto_revision(dep_config, dep)
         if not self.conf.upgrade:
             logging.info("skipping upgrade, see --upgrade, for package: {}".format(dep))
             return
@@ -31,6 +32,13 @@ class GitFetcher:
     def download_dep(self, dep_config: config.YamlConfig, dep: config.Dependency):
         logging.info("Downloading dep: {}".format(dep))
         proc_util.call(self.conf.lib_path, ["git", "clone", dep.url])
+        self.goto_revision(dep_config, dep)
+
+    def goto_revision(self, dep_config: config.YamlConfig, dep: config.Dependency):
+        if dep.revision is not None:
+            proc_util.call(self.resolve_full_dir(dep_config, dep), ["git", "checkouut", dep.revision])
+
+
 
     def resolve_full_dir(self, dep_config: config.YamlConfig, dep: config.Dependency):
         return os.path.join(self.conf.lib_path, dep.path)

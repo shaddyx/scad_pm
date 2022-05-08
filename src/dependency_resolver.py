@@ -9,7 +9,7 @@ import git_util
 
 class DependencyResolver:
     @Inject()
-    def __init__(self, scope: Scope, conf: config.ArgsConfig, parser: config.YamlConfigParser, fetcher: git_util.GitFetcher):
+    def __init__(self, scope: Scope, conf: config.ArgsConfig, parser: config.MainConfigParser, fetcher: git_util.GitFetcher):
         self.conf = conf
         self.parser = parser
         self.scope = scope
