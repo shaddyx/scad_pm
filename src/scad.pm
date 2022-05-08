@@ -1,1 +1,0 @@
-git@github.com:shaddyx/openscad_tools.git
