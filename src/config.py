@@ -37,7 +37,7 @@ class Dependency(object):
 
 @dataclass_json()
 @dataclasses.dataclass
-class YamlConfig(object):
+class FileConfig(object):
     dependencies: typing.List[Dependency]
 
 
@@ -66,11 +66,42 @@ class YamlConfigParser(ConfigParser):
             return self.map_data(data)
 
     def map_data(self, data):
-        conf = YamlConfig.from_dict(data)  # type: YamlConfig
+        conf = FileConfig.from_dict(data)  # type: FileConfig
         for dep in conf.dependencies:
             if dep.path is None:
                 dep.path = dep.url.split("/")[-1].split(".")[0]
         return conf
+
+
+class PmConfigParser(ConfigParser):
+    def is_type(self, file: str) -> bool:
+        return file.split(".")[-1] == 'pm'
+
+    @Inject()
+    def __init__(self, args_config: ArgsConfig):
+        self.args_config = args_config
+
+    def parse(self, file: str):
+        with open(file, "r") as stream:
+            data = stream.readlines()
+            logging.info("Parsing data: {}".format(data))
+            return self.map_data(data)
+
+    def map_data(self, data):
+        deps = [self._parse_dep(k) for k in data]
+        deps = filter(lambda x: x is not None, deps)
+        return FileConfig(list(deps))
+
+    def _parse_dep(self, k):
+        k = k.strip()
+        if k.startswith("#"):
+            return None
+        path = k.split("/")[-1].split(".")[0]
+        return Dependency(
+            k,
+            path=path
+        )
+
 
 class MainConfigParser:
     @Inject()
@@ -85,6 +116,5 @@ class MainConfigParser:
                 return k
         raise Exception("Parser not found for file: {}".format(file))
 
-    def parse(self, file: str) -> YamlConfig:
+    def parse(self, file: str) -> FileConfig:
         return self._get_parser(file).parse(file)
-
