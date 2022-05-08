@@ -6,6 +6,7 @@ from scopeton.scope import Scope
 
 import config
 import dependency_resolver
+import git_util
 from config import ArgsConfig
 
 parser = argparse.ArgumentParser(description='Openscad package manager')
@@ -24,7 +25,8 @@ scope = Scope()
 scope.registerInstance(ArgsConfig, args_config)
 scope.registerBean(
     config.YamlConfigParser,
-    dependency_resolver.DependencyResolver
+    dependency_resolver.DependencyResolver,
+    git_util.GitFetcher
 )
 
 resolver = scope.getInstance(dependency_resolver.DependencyResolver)
