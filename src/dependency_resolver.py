@@ -21,7 +21,7 @@ class DependencyResolver:
 
     def _check_type(self, path: str, file: str):
         if os.path.exists(os.path.join(path, file)):
-            return os.path.join(path, file)
+            return file
         else:
             return None
 
@@ -45,6 +45,9 @@ class DependencyResolver:
             self.run(self.dep_util.resolve_full_dir(dep_config, dep), file)
 
     def run(self, path, file=None):
+        logging.info("Running with path: {} and file: {}".format(path, file))
         if file is None:
             file = self._resolve_file_name(path, "scad_pm.yaml", "scad.pm")
-        self._do_resolve_deps(self.parser.parse(file))
+        parsed = self.parser.parse(os.path.join(path, file))
+        parsed.dep_path = path
+        self._do_resolve_deps(parsed)

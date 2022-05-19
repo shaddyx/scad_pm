@@ -13,11 +13,13 @@ class GitFetcher:
     def __init__(self, conf: config.ArgsConfig, dep_util: dep_util.DepUtil):
         self.conf = conf
         self.dep_util = dep_util
+    def _resolve_lib_path(self, dep_config: config.FileConfig, dep: config.Dependency):
+        return os.path.join(dep_config.dep_path, self.conf.lib_path)
 
     def fetch(self, dep_config: config.FileConfig, dep: config.Dependency):
-        if not os.path.exists(self.conf.lib_path):
-            os.mkdir(self.conf.lib_path)
-        logging.info("Ful dir: {}".format(self.dep_util.resolve_full_dir(dep_config, dep)))
+        if not os.path.exists(self._resolve_lib_path(dep_config, dep)):
+            os.mkdir(self._resolve_lib_path(dep_config, dep))
+        logging.info("Full dir: {}".format(self.dep_util.resolve_full_dir(dep_config, dep)))
         if not os.path.exists(self.dep_util.resolve_full_dir(dep_config, dep)):
             self.download_dep(dep_config, dep)
         else:
@@ -33,7 +35,7 @@ class GitFetcher:
 
     def download_dep(self, dep_config: config.FileConfig, dep: config.Dependency):
         logging.info("Downloading dep: {}".format(dep))
-        proc_util.call(self.conf.lib_path, ["git", "clone", dep.url])
+        proc_util.call(self._resolve_lib_path(dep_config, dep), ["git", "clone", dep.url])
         self.goto_revision(dep_config, dep)
 
     def goto_revision(self, dep_config: config.FileConfig, dep: config.Dependency):

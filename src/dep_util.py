@@ -10,4 +10,4 @@ class DepUtil:
         self.conf = conf
 
     def resolve_full_dir(self, dep_config: config.FileConfig, dep: config.Dependency):
-        return os.path.join(self.conf.lib_path, dep.path)
+        return os.path.join(dep_config.dep_path, self.conf.lib_path, dep.path)

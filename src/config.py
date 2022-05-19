@@ -39,6 +39,7 @@ class Dependency(object):
 @dataclasses.dataclass
 class FileConfig(object):
     dependencies: typing.List[Dependency]
+    dep_path: typing.Union[str, None] = None
 
 
 class ConfigParser:
