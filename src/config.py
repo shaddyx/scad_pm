@@ -98,9 +98,15 @@ class PmConfigParser(ConfigParser):
         if k.startswith("#"):
             return None
         path = k.split("/")[-1].split(".")[0]
+        if "#" in k:
+            branch = k.split("#")[1]
+        else:
+            branch = None
+        path = path.split("#")[0]
         return Dependency(
             k,
-            path=path
+            path=path,
+            revision=branch
         )
 
 

@@ -7,9 +7,10 @@
 
 *.egg-info
 dist
-venv*.pyc
+*.pyc
 __pycache__
 venv
 .mypy_cache
 .pytest_cache
 lib
+c

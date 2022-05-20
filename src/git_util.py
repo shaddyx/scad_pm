@@ -14,7 +14,7 @@ class GitFetcher:
         self.conf = conf
         self.dep_util = dep_util
     def _resolve_lib_path(self, dep_config: config.FileConfig, dep: config.Dependency):
-        return os.path.join(dep_config.dep_path, self.conf.lib_path)
+        return os.path.join(dep_config.dep_path or "", self.conf.lib_path)
 
     def fetch(self, dep_config: config.FileConfig, dep: config.Dependency):
         if not os.path.exists(self._resolve_lib_path(dep_config, dep)):
@@ -26,12 +26,13 @@ class GitFetcher:
             self.update_dep(dep_config, dep)
 
     def update_dep(self, dep_config: config.FileConfig, dep: config.Dependency):
-        self.goto_revision(dep_config, dep)
         if not self.conf.upgrade:
+            self.goto_revision(dep_config, dep)
             logging.info("skipping upgrade, see --upgrade, for package: {}".format(dep))
             return
         logging.info("Updating dep: {}".format(dep))
         proc_util.call(self.dep_util.resolve_full_dir(dep_config, dep), ["git", "pull"])
+        self.goto_revision(dep_config, dep)
 
     def download_dep(self, dep_config: config.FileConfig, dep: config.Dependency):
         logging.info("Downloading dep: {}".format(dep))
@@ -40,6 +41,7 @@ class GitFetcher:
 
     def goto_revision(self, dep_config: config.FileConfig, dep: config.Dependency):
         if dep.revision is not None:
-            proc_util.call(self.dep_util.resolve_full_dir(dep_config, dep), ["git", "checkouut", dep.revision])
+            logging.info("Checking out the revision: {}".format(dep.revision))
+            proc_util.call(self.dep_util.resolve_full_dir(dep_config, dep), ["git", "checkout", dep.revision])
 
 
