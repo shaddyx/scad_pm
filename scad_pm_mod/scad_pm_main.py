@@ -1,15 +1,11 @@
 #!/usr/bin/env python
-import logging
 import argparse
-import os.path
+import logging
 
 from scopeton.scope import Scope
 
-import config
-import dep_util
-import dependency_resolver
-import git_util
-from config import ArgsConfig
+from scad_pm_mod import config, dep_util, dependency_resolver, git_util
+from scad_pm_mod.config import ArgsConfig
 
 parser = argparse.ArgumentParser(description='Openscad package manager')
 parser.add_argument('--v', action='store_true', help='verbose output')

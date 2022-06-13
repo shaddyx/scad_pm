@@ -4,9 +4,7 @@ import os
 from scopeton.decorators import Inject
 from scopeton.scope import Scope
 
-import config
-import dep_util
-import git_util
+from scad_pm_mod import config, git_util, dep_util
 
 
 class DependencyResolver:
@@ -40,14 +38,17 @@ class DependencyResolver:
     def _resolve_dep(self, dep_config: config.FileConfig, dep: config.Dependency):
         logging.info("Resolving dependency: {}".format(dep))
         self.fetcher.fetch(dep_config, dep)
-        file = self._resolve_file_name(self.dep_util.resolve_full_dir(dep_config, dep), "scad_pm.yaml", "scad.pm")
+        file = self._resolve_file_name(self.dep_util.resolve_full_dir(dep_config, dep), "scad_pm_mod.yaml", "scad.pm")
         if file:
             self.run(self.dep_util.resolve_full_dir(dep_config, dep), file)
 
     def run(self, path, file=None):
         logging.info("Running with path: {} and file: {}".format(path, file))
         if file is None:
-            file = self._resolve_file_name(path, "scad_pm.yaml", "scad.pm")
-        parsed = self.parser.parse(os.path.join(path, file))
-        parsed.dep_path = path
-        self._do_resolve_deps(parsed)
+            file = self._resolve_file_name(path, "scad_pm_mod.yaml", "scad.pm")
+        if file is not None:
+            parsed = self.parser.parse(os.path.join(path, file))
+            parsed.dep_path = path
+            self._do_resolve_deps(parsed)
+        else:
+            logging.info("No dependency files found in {}".format(path))

@@ -3,9 +3,7 @@ import os
 
 from scopeton.decorators import Inject
 
-import config
-import dep_util
-import proc_util
+from scad_pm_mod import config, dep_util, proc_util
 
 
 class GitFetcher:

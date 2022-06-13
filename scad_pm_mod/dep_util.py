@@ -1,7 +1,8 @@
 import os
 
-import config
 from scopeton.decorators import Inject
+
+from scad_pm_mod import config
 
 
 class DepUtil:
