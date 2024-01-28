@@ -6,6 +6,7 @@ setup(
     version='0.23',
     scripts=['scad_pm'],
     packages=["scad_pm_mod"],
+    url="https://github.com/shaddyx/scad_pm",
     install_requires=[
         'pyyaml',
         'dataclasses_json',
