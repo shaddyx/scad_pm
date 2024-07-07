@@ -114,7 +114,7 @@ class MainConfigParser:
     @Inject()
     def __init__(self, scope: scopeton.scope.Scope):
         self.scope = scope
-        self.parsers = scope.getInstances(ConfigParser)
+        self.parsers = scope.get_instances(ConfigParser)
         logging.info("Config parsers: {}".format(self.parsers))
 
     def _get_parser(self, file: str) -> ConfigParser:
